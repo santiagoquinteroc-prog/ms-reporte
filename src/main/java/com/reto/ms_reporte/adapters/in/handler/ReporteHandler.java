@@ -6,6 +6,7 @@ import com.reto.ms_reporte.adapters.in.mapper.ReporteMapper;
 import com.reto.ms_reporte.application.ports.in.CreateReporteBootcampUseCase;
 import com.reto.ms_reporte.application.ports.in.GetTopPersonasUseCase;
 import com.reto.ms_reporte.application.ports.in.RegistrarInscripcionBootcampUseCase;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +16,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -23,6 +25,7 @@ public class ReporteHandler {
 	private final RegistrarInscripcionBootcampUseCase registrarInscripcionBootcampUseCase;
 	private final GetTopPersonasUseCase getTopPersonasUseCase;
 	private final ReporteMapper mapper;
+	private final Validator validator;
 
 	public Mono<ServerResponse> createReporteBootcamp(ServerRequest request) {
 		return request.bodyToMono(CreateReporteBootcampRequest.class)
@@ -38,6 +41,17 @@ public class ReporteHandler {
 	public Mono<ServerResponse> registrarInscripcionBootcamp(ServerRequest request) {
 		String bootcampId = request.pathVariable("bootcampId");
 		return request.bodyToMono(RegistrarInscripcionBootcampRequest.class)
+				.flatMap(body -> {
+					Set<jakarta.validation.ConstraintViolation<RegistrarInscripcionBootcampRequest>> violations = validator.validate(body);
+					if (!violations.isEmpty()) {
+						String errorMessage = violations.stream()
+								.map(v -> v.getPropertyPath() + ": " + v.getMessage())
+								.reduce((a, b) -> a + "; " + b)
+								.orElse("Validación fallida");
+						return Mono.error(new com.reto.ms_reporte.domain.exceptions.ReporteValidationException(errorMessage));
+					}
+					return Mono.just(body);
+				})
 				.map(mapper::toDomain)
 				.flatMap(persona -> registrarInscripcionBootcampUseCase.execute(bootcampId, persona))
 				.then(ServerResponse.status(HttpStatus.NO_CONTENT).build())

@@ -32,10 +32,7 @@ public class ReporteBootcamp {
 			personas = new ArrayList<>();
 		}
 		personas.add(persona);
-		if (cantidadPersonasInscritas == null) {
-			cantidadPersonasInscritas = 0;
-		}
-		cantidadPersonasInscritas++;
+		cantidadPersonasInscritas = personas.size();
 	}
 }
 

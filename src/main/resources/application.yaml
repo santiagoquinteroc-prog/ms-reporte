@@ -1,3 +1,15 @@
 spring:
   application:
     name: ms-reporte
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/reporte_db
+
+server:
+  port: 8084
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

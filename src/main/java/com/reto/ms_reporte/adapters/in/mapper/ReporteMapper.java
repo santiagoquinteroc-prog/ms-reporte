@@ -3,9 +3,12 @@ package com.reto.ms_reporte.adapters.in.mapper;
 import com.reto.ms_reporte.adapters.in.dto.CapacidadRefDTO;
 import com.reto.ms_reporte.adapters.in.dto.CreateReporteBootcampRequest;
 import com.reto.ms_reporte.adapters.in.dto.PersonaInscritaDTO;
+import com.reto.ms_reporte.adapters.in.dto.PersonaSimpleDTO;
+import com.reto.ms_reporte.adapters.in.dto.RegistrarInscripcionBootcampRequest;
 import com.reto.ms_reporte.adapters.in.dto.ReporteBootcampResponse;
 import com.reto.ms_reporte.adapters.in.dto.ReporteResponse;
 import com.reto.ms_reporte.adapters.in.dto.TecnologiaRefDTO;
+import com.reto.ms_reporte.adapters.in.dto.TopPersonasResponse;
 import com.reto.ms_reporte.domain.CapacidadRef;
 import com.reto.ms_reporte.domain.PersonaInscrita;
 import com.reto.ms_reporte.domain.ReporteBootcamp;
@@ -72,6 +75,30 @@ public class ReporteMapper {
 				.build();
 	}
 
+	public PersonaInscrita toDomain(RegistrarInscripcionBootcampRequest request) {
+		return PersonaInscrita.builder()
+				.nombre(request.getNombre())
+				.email(request.getCorreo())
+				.build();
+	}
+
+	public TopPersonasResponse toTopPersonasResponse(ReporteBootcamp domain) {
+		return TopPersonasResponse.builder()
+				.id(domain.getId())
+				.bootcampId(domain.getBootcampId())
+				.nombre(domain.getNombre())
+				.descripcion(domain.getDescripcion())
+				.fechaLanzamiento(domain.getFechaLanzamiento())
+				.duracionSemanas(domain.getDuracionSemanas())
+				.capacidades(toCapacidadDTOList(domain.getCapacidades()))
+				.tecnologias(toTecnologiaDTOList(domain.getTecnologias()))
+				.cantidadCapacidades(domain.getCantidadCapacidades())
+				.cantidadTecnologias(domain.getCantidadTecnologias())
+				.cantidadPersonasInscritas(domain.getCantidadPersonasInscritas())
+				.personas(toPersonaSimpleDTOList(domain.getPersonas()))
+				.build();
+	}
+
 	public PersonaInscritaDTO toDTO(PersonaInscrita domain) {
 		return PersonaInscritaDTO.builder()
 				.id(domain.getId())
@@ -80,6 +107,18 @@ public class ReporteMapper {
 				.tecnologias(toTecnologiaDTOList(domain.getTecnologias()))
 				.capacidades(toCapacidadDTOList(domain.getCapacidades()))
 				.build();
+	}
+
+	private List<PersonaSimpleDTO> toPersonaSimpleDTOList(List<PersonaInscrita> personas) {
+		if (personas == null) {
+			return null;
+		}
+		return personas.stream()
+				.map(p -> PersonaSimpleDTO.builder()
+						.nombre(p.getNombre())
+						.correo(p.getEmail())
+						.build())
+				.collect(Collectors.toList());
 	}
 
 	private List<PersonaInscritaDTO> toPersonaDTOList(List<PersonaInscrita> personas) {

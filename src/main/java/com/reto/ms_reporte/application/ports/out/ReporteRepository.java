@@ -7,6 +7,7 @@ public interface ReporteRepository {
 	Mono<ReporteBootcamp> save(ReporteBootcamp reporte);
 	Mono<ReporteBootcamp> findById(String id);
 	Mono<ReporteBootcamp> findByBootcampId(String bootcampId);
+	Mono<ReporteBootcamp> findTopByCantidadPersonasInscritas();
 }
 
 

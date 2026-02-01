@@ -41,6 +41,14 @@ public class ReporteMongoAdapter implements ReporteRepository {
 				.map(this::toDomain);
 	}
 
+	@Override
+	public Mono<ReporteBootcamp> findTopByCantidadPersonasInscritas() {
+		return repository.findAllSortedByCantidadPersonasInscritas(
+				org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "cantidadPersonasInscritas"))
+				.next()
+				.map(this::toDomain);
+	}
+
 	private ReporteBootcampDocument toDocument(ReporteBootcamp domain) {
 		return ReporteBootcampDocument.builder()
 				.id(domain.getId())
